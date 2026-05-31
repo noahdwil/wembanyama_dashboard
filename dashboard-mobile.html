@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title>Victor Wembanyama Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            height: 100%;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        body {
+            background: #fff;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 100%;
+            background: white;
+        }
+
+        header {
+            background: linear-gradient(135deg, #E63946 0%, #A4161A 100%);
+            color: white;
+            padding: 20px 15px;
+            text-align: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+
+        header h1 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+            line-height: 1.3;
+        }
+
+        header p {
+            font-size: 0.9em;
+            opacity: 0.9;
+        }
+
+        .nav-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+            overflow-x: auto;
+            scroll-behavior: smooth;
+        }
+
+        .nav-tab {
+            flex: 0 0 auto;
+            padding: 12px 12px;
+            cursor: pointer;
+            border: none;
+            background: none;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab:active {
+            background: #e9ecef;
+        }
+
+        .nav-tab.active {
+            color: #E63946;
+            border-bottom: 3px solid #E63946;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 15px;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .metric-card {
+            background: linear-gradient(135deg, #FFE5E5 0%, #FFB3B3 100%);
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .metric-card.alt {
+            background: linear-gradient(135deg, #E8F4F8 0%, #C3D9E3 100%);
+        }
+
+        .metric-value {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #E63946;
+            margin: 8px 0;
+        }
+
+        .metric-card.alt .metric-value {
+            color: #457B9D;
+        }
+
+        .metric-label {
+            color: #666;
+            font-size: 0.75em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 600;
+        }
+
+        .chart-container {
+            margin: 20px 0;
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 10px;
+            overflow: hidden;
+        }
+
+        .chart-title {
+            font-size: 1.1em;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 12px;
+            padding: 0 5px;
+        }
+
+        .controls {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .control-group {
+            margin-bottom: 12px;
+        }
+
+        .control-group:last-child {
+            margin-bottom: 0;
+        }
+
+        label {
+            display: block;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 6px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 6px;
+            font-size: 1em;
+            font-family: inherit;
+        }
+
+        select:active, input:active {
+            border-color: #E63946;
+            box-shadow: 0 0 0 3px rgba(230, 57, 70, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9em;
+            margin: 15px 0;
+        }
+
+        th {
+            background: #E63946;
+            color: white;
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 0.85em;
+        }
+
+        td {
+            padding: 10px 8px;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        tr.wembanyama {
+            background: #ffe5e5;
+        }
+
+        .footer {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+            color: #999;
+            font-size: 0.75em;
+            margin-top: 20px;
+        }
+
+        .btn-download {
+            width: 100%;
+            background: #E63946;
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1em;
+            font-weight: 600;
+            margin-bottom: 15px;
+            touch-action: manipulation;
+        }
+
+        .btn-download:active {
+            background: #A4161A;
+            transform: scale(0.98);
+        }
+
+        .insight-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 12px;
+            margin: 15px 0;
+            border-radius: 4px;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .insight-box strong {
+            color: #333;
+        }
+
+        /* Plotly chart sizing for mobile */
+        .plotly-graph-div {
+            width: 100% !important;
+            height: 300px !important;
+        }
+
+        @media (min-width: 600px) {
+            .metrics {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+            }
+
+            .plotly-graph-div {
+                height: 400px !important;
+            }
+
+            header h1 {
+                font-size: 1.8em;
+            }
+
+            .nav-tab {
+                padding: 15px 16px;
+                font-size: 0.95em;
+            }
+
+            table {
+                font-size: 1em;
+            }
+
+            th, td {
+                padding: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏀 Wembanyama Analysis</h1>
+            <p>Top 10 Hybrid Scorers</p>
+        </header>
+
+        <div class="nav-tabs">
+            <button class="nav-tab active" onclick="switchTab('overview')">Overview</button>
+            <button class="nav-tab" onclick="switchTab('rankings')">Rankings</button>
+            <button class="nav-tab" onclick="switchTab('compare')">Compare</button>
+            <button class="nav-tab" onclick="switchTab('table')">Data</button>
+        </div>
+
+        <!-- OVERVIEW -->
+        <div id="overview" class="tab-content active">
+            <div class="metrics">
+                <div class="metric-card">
+                    <div class="metric-label">Wembanyama</div>
+                    <div class="metric-value">3/10</div>
+                    <div style="font-size: 0.8em; color: #E63946;">Top Rankings</div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-label">Best Score</div>
+                    <div class="metric-value">0.651</div>
+                    <div style="font-size: 0.8em; color: #E63946;">2024-25</div>
+                </div>
+                <div class="metric-card alt">
+                    <div class="metric-label">Wingspan</div>
+                    <div class="metric-value">8'0"</div>
+                    <div style="font-size: 0.8em; color: #457B9D;">Tied Highest</div>
+                </div>
+                <div class="metric-card alt">
+                    <div class="metric-label">Reach</div>
+                    <div class="metric-value">7"</div>
+                    <div style="font-size: 0.8em; color: #457B9D;">Advantage</div>
+                </div>
+            </div>
+
+            <div class="insight-box">
+                <strong>🔑 Key Finding:</strong> Victor Wembanyama holds the highest hybrid score ever recorded in NBA history (0.6507). His elite combination of offensive skill and defensive length is unprecedented.
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">Top 10 Scores</div>
+                <div id="chart1"></div>
+            </div>
+
+            <div class="chart-container">
+                <div class="chart-title">Physical Profile</div>
+                <div id="chart2"></div>
+            </div>
+        </div>
+
+        <!-- RANKINGS -->
+        <div id="rankings" class="tab-content">
+            <div class="controls">
+                <div class="control-group">
+                    <label>
+                        <input type="checkbox" id="wembanyamaOnly" onchange="filterTable()" style="width: auto; margin-right: 8px;">
+                        Show Wembanyama only
+                    </label>
+                </div>
+                <div class="control-group">
+                    <label>Min Score: <span id="minScoreValue">0.55</span></label>
+                    <input type="range" id="minScore" min="0.55" max="0.66" step="0.01" value="0.55" onchange="filterTable()" style="width: 100%;">
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th style="width: 30%;">Player</th>
+                        <th style="width: 20%;">Season</th>
+                        <th style="width: 25%;">Score</th>
+                        <th style="width: 25%;">Wing</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+
+        <!-- COMPARISONS -->
+        <div id="compare" class="tab-content">
+            <div class="controls">
+                <div class="control-group">
+                    <label>X-Axis:</label>
+                    <select id="xAxis" onchange="updateComparison()">
+                        <option value="wingspan">Wingspan</option>
+                        <option value="height">Height</option>
+                        <option value="score">Hybrid Score</option>
+                    </select>
+                </div>
+                <div class="control-group">
+                    <label>Y-Axis:</label>
+                    <select id="yAxis" onchange="updateComparison()">
+                        <option value="score" selected>Hybrid Score</option>
+                        <option value="height">Height</option>
+                        <option value="wingspan">Wingspan</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <div id="chart3"></div>
+            </div>
+        </div>
+
+        <!-- DATA TABLE -->
+        <div id="table" class="tab-content">
+            <button class="btn-download" onclick="downloadCSV()">⬇️ Download CSV</button>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Player</th>
+                        <th>Season</th>
+                        <th>Score</th>
+                        <th>Height</th>
+                    </tr>
+                </thead>
+                <tbody id="fullTable"></tbody>
+            </table>
+        </div>
+
+        <div class="footer">
+            <p>NBA Data 2016-2026 | Interactive Analysis</p>
+        </div>
+    </div>
+
+    <script>
+        const data = [
+            {rank: 1, player: "Victor Wembanyama", season: "2024-25", score: 0.6507, height: 89, wingspan: 96, height_ft: "7'5\"", wingspan_ft: "8'0\"", reach: 7},
+            {rank: 2, player: "Anthony Davis", season: "2017-18", score: 0.6364, height: 82, wingspan: 90, height_ft: "6'10\"", wingspan_ft: "7'6\"", reach: 8},
+            {rank: 3, player: "Anthony Davis", season: "2018-19", score: 0.6071, height: 82, wingspan: 90, height_ft: "6'10\"", wingspan_ft: "7'6\"", reach: 8},
+            {rank: 4, player: "Victor Wembanyama", season: "2025-26", score: 0.6033, height: 89, wingspan: 96, height_ft: "7'5\"", wingspan_ft: "8'0\"", reach: 7},
+            {rank: 5, player: "Joel Embiid", season: "2023-24", score: 0.5848, height: 84, wingspan: 89, height_ft: "7'0\"", wingspan_ft: "7'5\"", reach: 5},
+            {rank: 6, player: "Victor Wembanyama", season: "2023-24", score: 0.5804, height: 89, wingspan: 96, height_ft: "7'5\"", wingspan_ft: "8'0\"", reach: 7},
+            {rank: 7, player: "Hassan Whiteside", season: "2019-20", score: 0.5712, height: 84, wingspan: 91, height_ft: "7'0\"", wingspan_ft: "7'7\"", reach: 7},
+            {rank: 8, player: "Anthony Davis", season: "2016-17", score: 0.5633, height: 82, wingspan: 90, height_ft: "6'10\"", wingspan_ft: "7'6\"", reach: 8},
+            {rank: 9, player: "Anthony Davis", season: "2023-24", score: 0.5562, height: 82, wingspan: 90, height_ft: "6'10\"", wingspan_ft: "7'6\"", reach: 8},
+            {rank: 10, player: "Nikola Jokic", season: "2024-25", score: 0.5504, height: 83, wingspan: 87, height_ft: "6'11\"", wingspan_ft: "7'3\"", reach: 4}
+        ];
+
+        function populateTables() {
+            let html = '';
+            data.forEach(row => {
+                const rowClass = row.player === 'Victor Wembanyama' ? 'class="wembanyama"' : '';
+                html += `<tr ${rowClass}>
+                    <td><strong>${row.player}</strong></td>
+                    <td>${row.season}</td>
+                    <td><strong>${row.score.toFixed(3)}</strong></td>
+                    <td>${row.wingspan_ft}</td>
+                </tr>`;
+            });
+            document.getElementById('tableBody').innerHTML = html;
+            document.getElementById('fullTable').innerHTML = html;
+        }
+
+        function filterTable() {
+            const wembanyamaOnly = document.getElementById('wembanyamaOnly').checked;
+            const minScore = parseFloat(document.getElementById('minScore').value);
+            document.getElementById('minScoreValue').textContent = minScore.toFixed(2);
+
+            let filtered = data.filter(row => {
+                if (wembanyamaOnly && row.player !== 'Victor Wembanyama') return false;
+                if (row.score < minScore) return false;
+                return true;
+            });
+
+            let html = '';
+            filtered.forEach(row => {
+                const rowClass = row.player === 'Victor Wembanyama' ? 'class="wembanyama"' : '';
+                html += `<tr ${rowClass}>
+                    <td><strong>${row.player}</strong></td>
+                    <td>${row.season}</td>
+                    <td><strong>${row.score.toFixed(3)}</strong></td>
+                    <td>${row.wingspan_ft}</td>
+                </tr>`;
+            });
+            document.getElementById('tableBody').innerHTML = html;
+        }
+
+        function createCharts() {
+            const layout = { margin: { l: 40, r: 20, t: 20, b: 40 }, font: { size: 11 }, paper_bgcolor: 'rgba(0,0,0,0)', plot_bgcolor: '#f9f9f9' };
+
+            // Chart 1: Rankings
+            const trace1 = {
+                x: data.map(d => `${d.player}\n(${d.season})`),
+                y: data.map(d => d.score),
+                type: 'bar',
+                marker: {color: data.map(d => d.player === 'Victor Wembanyama' ? '#E63946' : '#457B9D')},
+                text: data.map(s => s.score.toFixed(3)),
+                textposition: 'outside'
+            };
+            Plotly.newPlot('chart1', [trace1], {...layout, xaxis: {tickangle: -45}}, {responsive: true, displayModeBar: false});
+
+            // Chart 2: Physical
+            const uniquePlayers = [...new Map(data.map(d => [d.player, d])).values()];
+            const trace2a = {
+                x: uniquePlayers.map(d => d.player),
+                y: uniquePlayers.map(d => d.height),
+                name: 'Height',
+                type: 'bar',
+                marker: {color: uniquePlayers.map(d => d.player === 'Victor Wembanyama' ? '#E63946' : '#457B9D')}
+            };
+            const trace2b = {
+                x: uniquePlayers.map(d => d.player),
+                y: uniquePlayers.map(d => d.wingspan),
+                name: 'Wingspan',
+                type: 'bar',
+                marker: {color: uniquePlayers.map(d => d.player === 'Victor Wembanyama' ? '#C1121F' : '#1D3557')}
+            };
+            Plotly.newPlot('chart2', [trace2a, trace2b], {...layout, barmode: 'group', xaxis: {tickangle: -45}}, {responsive: true, displayModeBar: false});
+        }
+
+        function updateComparison() {
+            const xAxis = document.getElementById('xAxis').value;
+            const yAxis = document.getElementById('yAxis').value;
+            const axisMap = {
+                'score': {key: 'score', label: 'Score'},
+                'height': {key: 'height', label: 'Height'},
+                'wingspan': {key: 'wingspan', label: 'Wingspan'}
+            };
+
+            const trace = {
+                x: data.map(d => d[axisMap[xAxis].key]),
+                y: data.map(d => d[axisMap[yAxis].key]),
+                mode: 'markers',
+                type: 'scatter',
+                marker: {size: 10, color: data.map(d => d.player === 'Victor Wembanyama' ? '#E63946' : '#457B9D')}
+            };
+
+            const layout = {
+                margin: { l: 50, r: 20, t: 20, b: 50 },
+                font: { size: 11 },
+                paper_bgcolor: 'rgba(0,0,0,0)',
+                plot_bgcolor: '#f9f9f9',
+                xaxis: {title: axisMap[xAxis].label},
+                yaxis: {title: axisMap[yAxis].label}
+            };
+
+            Plotly.newPlot('chart3', [trace], layout, {responsive: true, displayModeBar: false});
+        }
+
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-tab').forEach(el => el.classList.remove('active'));
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        function downloadCSV() {
+            let csv = 'Player,Season,Score,Height,Wingspan\n';
+            data.forEach(row => {
+                csv += `${row.player},${row.season},${row.score},${row.height_ft},${row.wingspan_ft}\n`;
+            });
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'wembanyama.csv';
+            a.click();
+        }
+
+        populateTables();
+        createCharts();
+        updateComparison();
+    </script>
+</body>
+</html>
